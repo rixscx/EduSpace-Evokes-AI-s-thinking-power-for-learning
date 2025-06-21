@@ -14,7 +14,7 @@ interface LessonItemProps {
   viewRole?: 'student' | 'teacher';
 }
 
-export default LessonCard({ 
+export function LessonItem({ 
   lesson, 
   courseId, 
   isCompleted = false, 
