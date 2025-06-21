@@ -1,7 +1,7 @@
 
 import { getCertificateRecordById } from "@/lib/mockCourses";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckBadge, GraduationCap, XCircle } from "lucide-react";
+import { CheckCircle2, GraduationCap, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
