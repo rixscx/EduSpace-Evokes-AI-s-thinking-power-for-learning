@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, BookOpen, Clock, Users, Edit3, ShieldCheck, BarChart2, ChevronDown, ChevronUp, Trash2, Eye, RotateCcw, ListOrdered, MessageSquare, Send, AlertCircle, Award, CheckCircle2, XCircle } from "lucide-react";
+import { Star, BookOpen, Clock, Users, Edit3, ShieldCheck, BarChart2, ChevronDown, ChevronUp, Trash2, Eye, RotateCcw, ListOrdered, MessageSquare, Send, AlertCircle, Award, BadgeCheck, XCircle } from "lucide-react";
 import type { Course, Feedback as FeedbackType, Module as ModuleType, Chapter as ChapterType, CourseSuggestion, CourseSuggestionReply, Review, CertificateRecord } from "@/types/platform";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -435,7 +435,7 @@ export default function TeacherCourseDetailPage() {
                     </div>
                  ) : certificateRecords.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
-                        <CheckBadge className="h-12 w-12 mx-auto opacity-40 mb-3"/>
+                        <BadgeCheck className="h-12 w-12 mx-auto opacity-40 mb-3"/>
                         <p className="text-sm">No certificates are currently pending validation for this course.</p>
                     </div>
                  ) : (
@@ -454,7 +454,7 @@ export default function TeacherCourseDetailPage() {
                                                 {isUpdatingCertStatus === cert.id ? <RotateCcw className="h-3.5 w-3.5 animate-spin"/> : <XCircle className="h-3.5 w-3.5"/>}
                                             </Button>
                                             <Button size="sm" variant="default" className="text-xs bg-green-600 hover:bg-green-700" onClick={() => handleCertificateStatusUpdate(cert.id!, 'approved')} disabled={isUpdatingCertStatus === cert.id}>
-                                                {isUpdatingCertStatus === cert.id ? <RotateCcw className="h-3.5 w-3.5 animate-spin"/> : <CheckBadge className="h-3.5 w-3.5"/>}
+                                                {isUpdatingCertStatus === cert.id ? <RotateCcw className="h-3.5 w-3.5 animate-spin"/> : <BadgeCheck className="h-3.5 w-3.5"/>}
                                             </Button>
                                           </>
                                         ) : (
