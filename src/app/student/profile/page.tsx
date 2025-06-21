@@ -18,7 +18,7 @@ import {
   FileText as FileTextIcon,
   CalendarDays,
   RotateCcw,
-  CheckBadge,
+  CheckCircle2,
   ExternalLink,
   Share2
 } from "lucide-react";
