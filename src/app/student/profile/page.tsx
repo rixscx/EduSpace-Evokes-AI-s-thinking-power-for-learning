@@ -23,7 +23,7 @@ import {
   Share2
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LessonItem from '@/components/course/LessonItem';
+import LessonCard from '@/components/course/LessonCard';
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
