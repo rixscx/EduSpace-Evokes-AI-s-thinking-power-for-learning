@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, BookOpen, Clock, Users, Edit3, ShieldCheck, BarChart2, ChevronDown, ChevronUp, Trash2, Eye, RotateCcw, ListOrdered, MessageSquare, Send, AlertCircle, Award, CheckBadge, XCircle } from "lucide-react";
+import { Star, BookOpen, Clock, Users, Edit3, ShieldCheck, BarChart2, ChevronDown, ChevronUp, Trash2, Eye, RotateCcw, ListOrdered, MessageSquare, Send, AlertCircle, Award, CheckCircle2, XCircle } from "lucide-react";
 import type { Course, Feedback as FeedbackType, Module as ModuleType, Chapter as ChapterType, CourseSuggestion, CourseSuggestionReply, Review, CertificateRecord } from "@/types/platform";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
