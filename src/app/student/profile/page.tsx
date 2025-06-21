@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import {
   FileText as FileTextIcon,
   CalendarDays,
   RotateCcw,
-  CheckBadge,
+  BadgeCheck,
   ExternalLink,
   Share2
 } from "lucide-react";
@@ -46,7 +46,33 @@ interface ProfileUser extends AppUser {
   }
 }
 
-export default function StudentProfilePage() {
+function ProfilePageSkeleton() {
+  return (
+    <div className="animate-fade-in space-y-8 p-4 md:p-6">
+        <Skeleton className="h-10 w-1/3 mb-4" />
+        <Card className="shadow-lg border-border/70 rounded-xl bg-card">
+            <CardContent className="p-6 md:p-8">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                    <Skeleton className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-muted" />
+                    <div className="flex-grow space-y-3 w-full md:w-auto">
+                        <Skeleton className="h-7 w-3/4 bg-muted rounded-md" />
+                        <Skeleton className="h-5 w-full bg-muted rounded-sm" />
+                        <Skeleton className="h-5 w-2/3 bg-muted rounded-sm" />
+                        <Skeleton className="h-9 w-1/3 bg-muted rounded-md mt-3" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-x-6 gap-y-3 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-border/60 md:pl-6 mt-4 md:mt-0 text-center w-full md:w-auto">
+                        {[1,2,3].map(i => <div key={i} className="space-y-1.5"><Skeleton className="h-7 w-10 bg-muted rounded-sm mx-auto" /><Skeleton className="h-4 w-20 bg-muted rounded-sm mx-auto" /></div>)}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+        <Skeleton className="h-12 w-full bg-muted rounded-md my-6" />
+        <Card className="shadow-lg border-border/70 bg-card"><CardContent className="p-6"><Skeleton className="h-72 bg-muted rounded-lg" /></CardContent></Card>
+    </div>
+  );
+}
+
+function StudentProfilePageContent() {
   const { user: firebaseUser, role, isLoading: authIsLoading } = useAuth();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -142,31 +168,7 @@ export default function StudentProfilePage() {
 
 
   if (authIsLoading || pageLoading) {
-    return (
-        <DashboardLayout role="student">
-            <div className="animate-fade-in space-y-8 p-4 md:p-6">
-                <Skeleton className="h-10 w-1/3 mb-4" />
-                <Card className="shadow-lg border-border/70 rounded-xl bg-card">
-                    <CardContent className="p-6 md:p-8">
-                        <div className="flex flex-col md:flex-row items-center gap-6">
-                            <Skeleton className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-muted" />
-                            <div className="flex-grow space-y-3 w-full md:w-auto">
-                                <Skeleton className="h-7 w-3/4 bg-muted rounded-md" />
-                                <Skeleton className="h-5 w-full bg-muted rounded-sm" />
-                                <Skeleton className="h-5 w-2/3 bg-muted rounded-sm" />
-                                <Skeleton className="h-9 w-1/3 bg-muted rounded-md mt-3" />
-                            </div>
-                            <div className="grid grid-cols-3 gap-x-6 gap-y-3 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-border/60 md:pl-6 mt-4 md:mt-0 text-center w-full md:w-auto">
-                                {[1,2,3].map(i => <div key={i} className="space-y-1.5"><Skeleton className="h-7 w-10 bg-muted rounded-sm mx-auto" /><Skeleton className="h-4 w-20 bg-muted rounded-sm mx-auto" /></div>)}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Skeleton className="h-12 w-full bg-muted rounded-md my-6" />
-                <Card className="shadow-lg border-border/70 bg-card"><CardContent className="p-6"><Skeleton className="h-72 bg-muted rounded-lg" /></CardContent></Card>
-            </div>
-        </DashboardLayout>
-    );
+    return <ProfilePageSkeleton />;
   }
 
   if (!profileData || !profileData.stats) {
@@ -317,7 +319,7 @@ export default function StudentProfilePage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {earnedCertificates.map(cert => (
                             <Card key={cert.id} className={cn("p-4 flex flex-col items-center text-center bg-muted/50", highlightedCertificateId === cert.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
-                                <CheckBadge className="h-10 w-10 text-green-600 mb-2" />
+                                <BadgeCheck className="h-10 w-10 text-green-600 mb-2" />
                                 <p className="font-semibold text-foreground text-sm">{cert.courseTitle}</p>
                                 <p className="text-xs text-muted-foreground">Issued: {format(new Date(cert.issuedDate), "MMM d, yyyy")}</p>
                                 <div className="mt-3 flex items-center gap-2">
@@ -364,4 +366,12 @@ export default function StudentProfilePage() {
       </div>
     </DashboardLayout>
   );
+}
+
+export default function StudentProfilePage() {
+    return (
+        <Suspense fallback={<DashboardLayout role="student"><ProfilePageSkeleton /></DashboardLayout>}>
+            <StudentProfilePageContent />
+        </Suspense>
+    )
 }
