@@ -370,7 +370,7 @@ function StudentProfilePageContent() {
 
 export default function StudentProfilePage() {
     return (
-        <Suspense fallback={<DashboardLayout role="student"><ProfilePageSkeleton /></DashboardLayout>}>
+        <Suspense fallback={<ProfilePageSkeleton />}>
             <StudentProfilePageContent />
         </Suspense>
     )
