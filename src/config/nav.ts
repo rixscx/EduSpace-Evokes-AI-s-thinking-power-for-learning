@@ -1,4 +1,3 @@
-
 import type { User, NavItem, NotificationItem, SidebarNavConfig } from "@/types/platform";
 import {
   LayoutDashboard,
@@ -8,7 +7,7 @@ import {
   Library,
   PlusCircle,
   UserCircle,
-  BookOpenCheck, 
+  BookOpenCheck,
   Search as SearchIcon,
   Award,
   Settings,
@@ -23,15 +22,17 @@ import {
   BarChartBig,
   Camera,
   Palette, Smartphone, Puzzle as PuzzleIcon, Cloud, Briefcase, Megaphone,
-  Code2, 
-  Brain, 
-  Atom, 
-  Landmark, 
+  Code2,
+  Brain,
+  Atom,
+  Landmark,
   Film,
   LucideIcon,
-  Zap, 
-  Bell, 
-  Mail 
+  Zap,
+  Bell,
+  Mail,
+  ListChecks,
+  CheckCircle
 } from "lucide-react";
 
 
@@ -51,7 +52,7 @@ export const placeholderUser: User = {
   email: "alex.johnson@example.com",
   avatarUrl: "https://placehold.co/100x100.png?text=AJ",
   role: "student",
-  joinedDate: "2023-06-16T10:00:00.000Z", 
+  joinedDate: "2023-06-16T10:00:00.000Z",
   stats: {
     coursesEnrolled: 5,
     coursesCompleted: 2,
@@ -67,10 +68,10 @@ export const getIconForCategory = (categoryName?: string): LucideIcon => {
     case 'ai':
     case 'artificial intelligence':
       return Brain;
-    case 'web development': 
+    case 'web development':
     case 'react':
       return Code2;
-    case 'machine learning': return Sparkles; 
+    case 'machine learning': return Sparkles;
     case 'data science': return BarChartBig;
     case 'design':
     case 'art & design':
@@ -102,7 +103,29 @@ export const profileCardIcons = {
     ContinueLearningIcon: BarChartBig,
 };
 
-const LOCALSTORAGE_READ_NOTIFICATION_IDS_KEY = "eduspace_readNotificationIds";
+// --- Notification System ---
+
+const LOCALSTORAGE_NOTIFICATIONS_KEY = "eduspace_notifications_v2";
+const LOCALSTORAGE_READ_NOTIFICATION_IDS_KEY = "eduspace_readNotificationIds_v2";
+let deletedNotificationsHistory: StoredNotification[] = [];
+
+type StoredNotification = Omit<NotificationItem, 'icon' | 'read'>;
+
+function getNotificationsFromStorage(): StoredNotification[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(LOCALSTORAGE_NOTIFICATIONS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error("Error parsing notifications from localStorage:", error);
+    return [];
+  }
+}
+
+function setNotificationsInStorage(notifications: StoredNotification[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(LOCALSTORAGE_NOTIFICATIONS_KEY, JSON.stringify(notifications));
+}
 
 const getReadNotificationIdsFromStorage = (): string[] => {
   if (typeof window === "undefined") return [];
@@ -115,48 +138,57 @@ const setReadNotificationIdsInStorage = (ids: string[]): void => {
   localStorage.setItem(LOCALSTORAGE_READ_NOTIFICATION_IDS_KEY, JSON.stringify(ids));
 };
 
-export let mockNotifications: NotificationItem[] = []; // Initialize as empty
-
-const sortNotifications = () => {
-  mockNotifications = [...mockNotifications].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-};
-sortNotifications(); 
-
-let deletedNotificationsHistory: NotificationItem[] = [];
+const getIconForNotification = (notification: StoredNotification): LucideIcon => {
+  switch (notification.category) {
+    case 'course': return GraduationCap;
+    case 'system': return Zap;
+    case 'community': return Users;
+    case 'suggestion': return MessageSquareHeart;
+    case 'general':
+    default: return Bell;
+  }
+}
 
 export function addNotification(
-  newNotificationData: Omit<NotificationItem, 'id' | 'createdAt' | 'read'>
-): NotificationItem {
-  const newNotification: NotificationItem = {
-    ...newNotificationData,
-    id: `notif${Date.now()}-${Math.random().toString(36).substring(2,9)}`,
+  newNotificationData: Omit<NotificationItem, 'id' | 'createdAt' | 'read' | 'icon'> & { icon?: LucideIcon }
+): void {
+  const { icon, ...rest } = newNotificationData;
+
+  const newNotification: StoredNotification = {
+    ...rest,
+    id: `notif-${Date.now()}-${Math.random().toString(36).substring(2,9)}`,
     createdAt: new Date(),
-    read: false, 
-    icon: newNotificationData.icon || (newNotificationData.category === 'suggestion' ? MessageSquareHeart : Bell), 
   };
-  mockNotifications = [newNotification, ...mockNotifications];
-  sortNotifications();
-  return newNotification;
+
+  const currentNotifications = getNotificationsFromStorage();
+  const updatedNotifications = [newNotification, ...currentNotifications];
+  setNotificationsInStorage(updatedNotifications);
 }
 
 export function deleteNotification(notificationId: string): void {
-  const indexToDelete = mockNotifications.findIndex(notif => notif.id === notificationId);
-  if (indexToDelete > -1) {
-    const deletedItem = mockNotifications[indexToDelete];
-    mockNotifications = mockNotifications.filter(notif => notif.id !== notificationId);
-    if (deletedItem) {
-      deletedNotificationsHistory.push(deletedItem); 
-    }
+  const currentNotifications = getNotificationsFromStorage();
+  const notificationToDelete = currentNotifications.find(n => n.id === notificationId);
+  if (notificationToDelete) {
+    deletedNotificationsHistory.push(notificationToDelete);
+    if (deletedNotificationsHistory.length > 10) deletedNotificationsHistory.shift(); // Keep history manageable
   }
+  const updatedNotifications = currentNotifications.filter(n => n.id !== notificationId);
+  setNotificationsInStorage(updatedNotifications);
 }
 
 export function undoLastNotificationDeletion(): NotificationItem | undefined {
   if (deletedNotificationsHistory.length > 0) {
     const itemToRestore = deletedNotificationsHistory.pop();
     if (itemToRestore) {
-      mockNotifications = [...mockNotifications, itemToRestore];
-      sortNotifications(); 
-      return itemToRestore;
+      const currentNotifications = getNotificationsFromStorage();
+      const updatedNotifications = [...currentNotifications, itemToRestore]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setNotificationsInStorage(updatedNotifications);
+      return {
+        ...itemToRestore,
+        read: getReadNotificationIdsFromStorage().includes(itemToRestore.id),
+        icon: getIconForNotification(itemToRestore)
+      };
     }
   }
   return undefined;
@@ -167,45 +199,46 @@ export function markNotificationAsRead(notificationId: string): void {
   if (!readIds.includes(notificationId)) {
     setReadNotificationIdsInStorage([...readIds, notificationId]);
   }
-  // The actual 'read' status on mockNotifications items will be set by consumers
-  // based on localStorage. This function just ensures the ID is recorded.
 }
 
 export function markNotificationAsUnread(notificationId: string): void {
   const readIds = getReadNotificationIdsFromStorage();
   setReadNotificationIdsInStorage(readIds.filter(id => id !== notificationId));
-  // Similar to markAsRead, consumers will update the 'read' status.
 }
 
 export function markAllNotificationsAsRead(): void {
-  const allCurrentIds = mockNotifications.map(n => n.id);
-  // To avoid duplicates and ensure all current are marked read, merge with existing.
+  const allCurrentIds = getNotificationsFromStorage().map(n => n.id);
   const existingReadIds = getReadNotificationIdsFromStorage();
   const newReadIds = Array.from(new Set([...existingReadIds, ...allCurrentIds]));
   setReadNotificationIdsInStorage(newReadIds);
 }
 
 export function markAllNotificationsAsUnread(): void {
-   // If marking all *currently visible* unread, we'd remove their IDs from localStorage
-   // For simplicity, let's assume this means clearing all *globally* stored read IDs.
-   // A more nuanced approach might only remove IDs of notifications currently in mockNotifications.
-  setReadNotificationIdsInStorage([]); 
+  setReadNotificationIdsInStorage([]);
 }
 
 export function getProcessedNotifications(): NotificationItem[] {
+  const storedNotifications = getNotificationsFromStorage();
   const readIds = getReadNotificationIdsFromStorage();
-  return [...mockNotifications]
-    .map(n => ({ ...n, read: readIds.includes(n.id) }))
+
+  return storedNotifications
+    .map(n => ({
+      ...n,
+      read: readIds.includes(n.id),
+      icon: getIconForNotification(n),
+    }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
+
+// --- Sidebar and Nav Config ---
 
 export const sidebarNavConfig: SidebarNavConfig = {
   admin: [
     { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, activePaths: ['/admin/dashboard'] },
     { title: "Users", href: "/admin/users", icon: Users, activePaths: ['/admin/users', '/admin/users/add', '/admin/users/[userId]/edit'] },
     { title: "Courses", href: "/admin/courses", icon: BookOpen, activePaths: ['/admin/courses', '/admin/courses/[courseId]/edit', '/admin/courses/[courseId]/preview'] },
-    { title: "Notifications Log", href: "/admin/notifications", icon: Bell, activePaths: ['/admin/notifications', '/admin/notifications/add'] }, 
+    { title: "Notifications Log", href: "/admin/notifications", icon: Bell, activePaths: ['/admin/notifications', '/admin/notifications/add'] },
     { title: "Announcements", href: "/admin/announcements/add", icon: Megaphone, activePaths: ['/admin/announcements/add'] },
   ],
   teacher: [

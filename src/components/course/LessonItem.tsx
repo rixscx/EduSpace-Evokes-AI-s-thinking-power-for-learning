@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { CheckCircle2, PlayCircle, Lock, FileText, Puzzle, LucideIcon, ListOrdered } from "lucide-react";
 import type { ChapterDisplayInfo } from "@/types/platform";
@@ -8,21 +7,21 @@ import { Badge } from "@/components/ui/badge";
 interface LessonItemProps {
   lesson: ChapterDisplayInfo;
   courseId: string;
-  isCompleted?: boolean; // Optional for teacher view
-  isLocked?: boolean;    // Optional for teacher view
-  index: number; 
+  isCompleted?: boolean;
+  isLocked?: boolean;
+  index: number;
   viewRole?: 'student' | 'teacher';
 }
 
-export function LessonItem({ 
-  lesson, 
-  courseId, 
-  isCompleted = false, 
-  isLocked = false, 
+export function LessonItem({
+  lesson,
+  courseId,
+  isCompleted = false,
+  isLocked = false,
   index,
-  viewRole = 'student' 
+  viewRole = 'student'
 }: LessonItemProps) {
-  
+
   let ItemIcon: LucideIcon;
   let iconColorClass: string;
 
@@ -33,7 +32,7 @@ export function LessonItem({
     ItemIcon = isCompleted ? CheckCircle2 : isLocked ? Lock : PlayCircle;
     iconColorClass = isCompleted ? "text-green-600" : isLocked ? "text-muted-foreground/70" : "text-primary";
   }
-  
+
   const lessonTitleDisplay = lesson.lessonTitle || "(Untitled Lesson)";
 
   const lessonContentIndicators: { icon: LucideIcon; label: string }[] = [];
@@ -44,16 +43,15 @@ export function LessonItem({
     lessonContentIndicators.push({ icon: FileText, label: `Material (${lesson.materials.length})` });
   }
 
-
   const baseItemClasses = "flex items-center justify-between p-3.5 border-b border-border/60 last:border-b-0 transition-colors duration-150 ease-in-out text-sm";
   const interactiveItemClasses = "hover:bg-muted/60 cursor-pointer group";
   const lockedItemClasses = "opacity-70 cursor-not-allowed bg-muted/30 hover:bg-muted/30";
 
   const itemContent = (
     <>
-      <div className="flex items-center flex-grow min-w-0"> 
+      <div className="flex items-center flex-grow min-w-0">
         <ItemIcon className={cn("h-5 w-5 mr-3 shrink-0", iconColorClass)} />
-        <div className="flex-grow min-w-0"> 
+        <div className="flex-grow min-w-0">
           <h4 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
             {index + 1}. {lessonTitleDisplay}
           </h4>
@@ -79,7 +77,7 @@ export function LessonItem({
       </div>
     );
   }
-  
+
   if (viewRole === 'teacher') {
     return (
       <div className={cn(baseItemClasses)}>

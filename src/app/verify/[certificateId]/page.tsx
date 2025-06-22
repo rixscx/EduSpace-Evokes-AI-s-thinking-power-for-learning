@@ -1,7 +1,6 @@
-
 import { getCertificateRecordById } from "@/lib/mockCourses";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckBadge, GraduationCap, XCircle } from "lucide-react";
+import { BadgeCheck, GraduationCap, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
@@ -21,7 +20,7 @@ export default async function VerifyCertificatePage({ params }: { params: { cert
           <CardContent className="p-6 md:p-8 text-center">
             {certificate && certificate.status === 'approved' ? (
               <div className="space-y-4">
-                <CheckBadge className="mx-auto h-20 w-20 text-green-500" />
+                <BadgeCheck className="mx-auto h-20 w-20 text-green-500" />
                 <h2 className="text-xl font-semibold text-green-600">Certificate Verified</h2>
                 <p className="text-foreground/90">This is to certify that</p>
                 <p className="text-3xl font-bold text-foreground tracking-tight">{certificate.studentName}</p>
