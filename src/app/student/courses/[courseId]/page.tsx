@@ -5,7 +5,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LessonItem } from "@/components/course/LessonItem";
+import { LessonCard } from "@/components/course/LessonCard";
 import { Star, BookOpen, Users, PlayCircle, Award, ChevronDown, ChevronUp, RotateCcw, CheckCircle, MessageSquare, Edit2, SendHorizonal, AlertTriangle, HelpCircle, FileSignature, ListChecks, ExternalLink, Loader2, AlertCircle } from "lucide-react";
 import type { Course, Module as ModuleType, Review, Chapter as ChapterType, ChapterDisplayInfo, BadgeAward, FinalQuizAttempt, CertificateRecord, QuizQuestion } from "@/types/platform";
 import Link from "next/link";
